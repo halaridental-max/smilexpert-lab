@@ -1,0 +1,2344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmileXpert Lab Tracker</title>
+
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ════════════════════════════════════════
+   SmileXpert Lab Tracker — Professional UI
+   ════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg: #f5f7fa;
+  --surface: #ffffff;
+  --surface2: #f8f9fb;
+  --border: #e2e8f0;
+  --border2: #cbd5e1;
+  --accent: #2563eb;
+  --accent-hover: #1d4ed8;
+  --accent-light: #eff6ff;
+  --accent-mid: #bfdbfe;
+  --text: #0f172a;
+  --text2: #334155;
+  --muted: #64748b;
+  --muted2: #94a3b8;
+  --danger: #dc2626;
+  --danger-light: #fef2f2;
+  --warn: #d97706;
+  --warn-light: #fffbeb;
+  --success: #16a34a;
+  --success-light: #f0fdf4;
+  --sidebar-w: 240px;
+  --radius: 10px;
+  --radius-lg: 14px;
+  --shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+  --shadow-md: 0 4px 6px rgba(0,0,0,.07), 0 2px 4px rgba(0,0,0,.06);
+  --shadow-lg: 0 10px 25px rgba(0,0,0,.1), 0 4px 10px rgba(0,0,0,.06);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { font-size: 15px; }
+
+body {
+  font-family: 'Inter', system-ui, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+/* ══ LOCK SCREEN ══ */
+#lockScreen {
+  position: fixed; inset: 0;
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 50%, #0f172a 100%);
+  display: flex; align-items: center; justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.lock-wrap { text-align: center; width: 100%; max-width: 380px; }
+
+.lock-logo {
+  font-size: 52px; margin-bottom: 12px;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,.3));
+}
+
+.lock-clinic {
+  font-size: 22px; font-weight: 700; color: #fff;
+  margin-bottom: 4px; letter-spacing: -.3px;
+}
+
+.lock-address {
+  font-size: 11px; color: rgba(255,255,255,.6);
+  margin-bottom: 28px; line-height: 1.6;
+}
+
+.lock-card {
+  background: rgba(255,255,255,.07);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,.15);
+  border-radius: 20px;
+  padding: 28px 24px;
+}
+
+.lock-card .field-label { color: rgba(255,255,255,.7); }
+
+.lock-card .field-input {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.2);
+  color: #fff;
+}
+
+.lock-card .field-input option { background: #1e3a8a; color: #fff; }
+
+.pin-dots {
+  display: flex; gap: 14px; justify-content: center;
+  margin: 16px 0;
+}
+
+.dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.4);
+  background: transparent; transition: all .15s;
+}
+
+.dot.filled { background: #fff; border-color: #fff; }
+
+.pin-pad {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; margin-bottom: 12px;
+}
+
+.pin-btn {
+  padding: 14px; border: 1px solid rgba(255,255,255,.2);
+  border-radius: 12px;
+  background: rgba(255,255,255,.1);
+  color: #fff; font-size: 18px; font-weight: 600;
+  font-family: 'Inter', sans-serif;
+  cursor: pointer; transition: all .12s;
+}
+
+.pin-btn:hover { background: rgba(255,255,255,.2); }
+.pin-btn.del { font-size: 14px; color: #fca5a5; }
+
+.pin-error { color: #fca5a5; font-size: 12px; min-height: 18px; margin-bottom: 4px; }
+.pin-hint {
+  font-size: 11px; color: rgba(255,255,255,.5);
+  background: rgba(255,255,255,.08);
+  border-radius: 8px; padding: 6px 10px;
+  margin-top: 8px; min-height: 28px;
+}
+
+/* ══ APP SHELL ══ */
+#appShell {
+  display: flex; min-height: 100vh;
+}
+
+/* SIDEBAR */
+#sidebar {
+  width: var(--sidebar-w);
+  background: var(--text);
+  display: flex; flex-direction: column;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  z-index: 100;
+  transition: transform .25s;
+}
+
+.sidebar-brand {
+  display: flex; align-items: center; gap: 10px;
+  padding: 20px 18px 16px;
+  border-bottom: 1px solid rgba(255,255,255,.08);
+}
+
+.brand-icon { font-size: 28px; }
+.brand-name { font-size: 15px; font-weight: 700; color: #fff; }
+.brand-sub { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 1px; }
+
+.sidebar-nav {
+  flex: 1; padding: 12px 10px; overflow-y: auto;
+  display: flex; flex-direction: column; gap: 2px;
+}
+
+.nav-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px; border: none; background: transparent;
+  color: rgba(255,255,255,.6); font-family: 'Inter', sans-serif;
+  font-size: 13px; font-weight: 500;
+  border-radius: 9px; cursor: pointer;
+  transition: all .15s; text-align: left; width: 100%;
+}
+
+.nav-item:hover { background: rgba(255,255,255,.08); color: #fff; }
+.nav-item.active { background: var(--accent); color: #fff; }
+.nav-icon { font-size: 16px; width: 20px; text-align: center; }
+.nav-item.hidden { display: none; }
+
+.sidebar-footer {
+  padding: 14px 14px 18px;
+  border-top: 1px solid rgba(255,255,255,.08);
+  display: flex; align-items: center; gap: 10px;
+}
+
+.user-avatar {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: var(--accent); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; flex-shrink: 0;
+}
+
+.user-info { flex: 1; overflow: hidden; }
+.user-name { font-size: 12px; font-weight: 600; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.user-role { font-size: 10px; color: rgba(255,255,255,.4); margin-top: 1px; }
+
+.lock-btn {
+  background: rgba(255,255,255,.1); border: none;
+  color: rgba(255,255,255,.6); padding: 7px 10px;
+  border-radius: 8px; cursor: pointer; font-size: 14px;
+  transition: all .15s;
+}
+.lock-btn:hover { background: rgba(255,255,255,.2); color: #fff; }
+
+/* TOPBAR (mobile) */
+.topbar {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; height: 54px;
+  background: var(--text); color: #fff;
+  align-items: center; justify-content: space-between;
+  padding: 0 16px; z-index: 99;
+}
+
+.menu-btn, .lock-btn-top {
+  background: none; border: none; color: rgba(255,255,255,.7);
+  font-size: 20px; cursor: pointer; padding: 4px 8px;
+}
+
+.topbar-title { font-size: 14px; font-weight: 600; }
+
+#sidebarOverlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); z-index: 99;
+}
+
+/* MAIN */
+#mainContent {
+  margin-left: var(--sidebar-w);
+  flex: 1; min-height: 100vh;
+  padding: 28px 28px 48px;
+}
+
+.tab-pane { display: none; }
+.tab-pane.active { display: block; }
+
+/* PAGE HEADER */
+.page-header {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
+}
+
+.page-title {
+  font-size: 20px; font-weight: 700; color: var(--text);
+  letter-spacing: -.3px;
+}
+
+.page-date { font-size: 13px; color: var(--muted); }
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 14px; margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 18px 16px;
+  box-shadow: var(--shadow);
+}
+
+.stat-num { font-size: 28px; font-weight: 700; color: var(--accent); line-height: 1; }
+.stat-num.warn { color: var(--warn); }
+.stat-num.danger { color: var(--danger); }
+.stat-num.success { color: var(--success); }
+.stat-label { font-size: 11px; color: var(--muted); margin-top: 5px; font-weight: 500; }
+
+/* DASHBOARD GRID */
+.dash-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 20px;
+}
+
+.section-heading {
+  font-size: 13px; font-weight: 700; color: var(--text2);
+  margin-bottom: 12px; text-transform: uppercase; letter-spacing: .5px;
+}
+
+/* FORM CARDS */
+.form-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); margin-bottom: 16px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+
+.form-card-header {
+  display: flex; align-items: center; gap: 12px;
+  padding: 14px 20px;
+  background: var(--surface2); border-bottom: 1px solid var(--border);
+  font-size: 13px; font-weight: 600; color: var(--text2);
+}
+
+.step-chip {
+  background: var(--accent); color: #fff;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 16px; padding: 20px;
+}
+
+.field-group { display: flex; flex-direction: column; gap: 5px; }
+.field-group.full { grid-column: 1 / -1; }
+
+.field-label {
+  font-size: 11px; font-weight: 600; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .4px;
+}
+
+.field-input {
+  font-family: 'Inter', sans-serif; font-size: 13px;
+  padding: 9px 11px; border: 1.5px solid var(--border);
+  border-radius: 8px; background: var(--surface);
+  color: var(--text); outline: none; width: 100%;
+  transition: border-color .15s, box-shadow .15s;
+}
+
+.field-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+.field-input::placeholder { color: var(--muted2); }
+textarea.field-input { resize: vertical; min-height: 80px; }
+
+/* UNITS TABLE */
+.form-card .units-area { padding: 0 20px 20px; }
+.table-wrap { overflow-x: auto; padding: 0 20px; }
+
+.units-tbl {
+  width: 100%; border-collapse: collapse;
+  min-width: 700px;
+}
+
+.units-tbl th {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 8px 9px; text-align: left;
+  background: var(--surface2);
+  border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.units-tbl td {
+  padding: 7px 9px; border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+
+.units-tbl tr:last-child td { border-bottom: none; }
+
+.units-tbl input[type=number] { width: 65px; }
+.units-tbl select { min-width: 140px; }
+
+.units-total { font-weight: 700; color: var(--accent); text-align: center; font-size: 14px; }
+.units-amount { font-weight: 600; color: var(--success); }
+
+.add-row-btn {
+  display: inline-flex; align-items: center; gap: 5px;
+  margin: 10px 20px 0;
+  font-size: 12px; color: var(--accent);
+  background: var(--accent-light); border: 1px dashed var(--accent-mid);
+  border-radius: 7px; padding: 7px 14px;
+  cursor: pointer; font-family: 'Inter', sans-serif;
+  transition: all .15s;
+}
+
+.add-row-btn:hover { background: var(--accent-mid); }
+
+.units-summary {
+  margin: 10px 20px 20px;
+  background: var(--accent-light); border: 1.5px solid var(--accent-mid);
+  border-radius: 8px; padding: 10px 14px;
+  font-size: 13px; font-weight: 700; color: var(--accent);
+}
+
+.del-unit-btn {
+  background: none; border: none; cursor: pointer;
+  color: var(--danger); font-size: 15px; padding: 0 4px;
+}
+
+/* BUTTONS */
+.btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 10px 20px; border: none; border-radius: 9px;
+  font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600;
+  cursor: pointer; transition: all .15s; white-space: nowrap;
+}
+
+.btn-primary { background: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-hover); }
+.btn-outline { background: transparent; border: 1.5px solid var(--accent); color: var(--accent); }
+.btn-outline:hover { background: var(--accent-light); }
+.btn-ghost { background: var(--surface2); border: 1.5px solid var(--border); color: var(--text2); }
+.btn-ghost:hover { background: var(--border); }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-sm { padding: 6px 13px; font-size: 12px; }
+
+.form-actions {
+  display: flex; gap: 10px; padding: 0 0 8px;
+  flex-wrap: wrap;
+}
+
+/* JOB CREATED BOX */
+.job-created-box {
+  background: var(--success-light); border: 1.5px solid #86efac;
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 12px; margin-top: 14px; flex-wrap: wrap;
+}
+
+.jcb-label { font-size: 11px; color: var(--success); font-weight: 600; margin-bottom: 4px; }
+.jcb-id { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 500; color: var(--success); letter-spacing: 1px; }
+
+/* SEARCH */
+.search-row { display: flex; gap: 10px; margin-bottom: 20px; }
+.search-row .field-input { flex: 1; }
+
+/* UPDATE PANEL */
+.update-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  margin-bottom: 14px; box-shadow: var(--shadow);
+  flex-wrap: wrap; gap: 10px;
+}
+
+.up-job-id { font-family: 'JetBrains Mono', monospace; font-size: 14px; font-weight: 500; color: var(--accent); }
+.up-patient { font-size: 18px; font-weight: 700; margin-top: 3px; }
+
+.info-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 10px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 14px; margin-bottom: 14px;
+}
+
+.info-item .info-lbl { font-size: 10px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+.info-item .info-val { font-size: 13px; font-weight: 500; margin-top: 2px; }
+
+.units-readonly {
+  background: var(--accent-light); border: 1px solid var(--accent-mid);
+  border-radius: var(--radius); padding: 12px 14px;
+  margin-bottom: 14px; font-size: 12px;
+}
+
+.update-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); margin-bottom: 12px;
+  box-shadow: var(--shadow); overflow: hidden;
+}
+
+.update-section-title {
+  font-size: 11px; font-weight: 700; color: var(--accent);
+  text-transform: uppercase; letter-spacing: .6px;
+  padding: 12px 18px; background: var(--surface2);
+  border-bottom: 1px solid var(--border);
+}
+
+.update-section .form-grid { padding: 16px 18px; }
+
+/* STATUS BADGES */
+.status-badge {
+  display: inline-flex; align-items: center;
+  padding: 4px 12px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; white-space: nowrap;
+}
+
+.s-registered { background: #f1f5f9; color: #475569; }
+.s-impression { background: #ede9fe; color: #7c3aed; }
+.s-cast { background: #fef3c7; color: #b45309; }
+.s-dispatched { background: #dbeafe; color: #1d4ed8; }
+.s-received { background: #dcfce7; color: #15803d; }
+.s-called { background: #fce7f3; color: #be185d; }
+.s-cemented { background: #d1fae5; color: #065f46; }
+.s-billed { background: #e0e7ff; color: #4338ca; }
+.s-late { background: #fee2e2; color: #b91c1c; }
+
+/* FILTER BAR */
+.filter-bar {
+  display: flex; gap: 10px; margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.filter-bar .field-input { min-width: 140px; flex: 1; }
+
+/* JOB CARDS */
+.job-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 16px 18px;
+  margin-bottom: 10px; cursor: pointer;
+  box-shadow: var(--shadow);
+  transition: border-color .15s, box-shadow .15s, transform .1s;
+}
+
+.job-card:hover {
+  border-color: var(--accent-mid);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.job-card-top {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px;
+  flex-wrap: wrap;
+}
+
+.job-card-id { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--accent); font-weight: 500; }
+.job-card-name { font-size: 15px; font-weight: 700; margin-top: 2px; }
+.job-card-meta { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.7; }
+.job-card-right { text-align: right; }
+
+/* PIPELINE */
+.pipeline {
+  display: flex; margin-top: 12px; overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.pipe-stage {
+  flex: 1; min-width: 50px; text-align: center; position: relative;
+}
+
+.pipe-stage::before, .pipe-stage::after {
+  content: ''; position: absolute; top: 10px;
+  height: 2px; background: var(--border); z-index: 0;
+}
+
+.pipe-stage::before { left: 0; width: 50%; }
+.pipe-stage::after { right: 0; width: 50%; }
+.pipe-stage:first-child::before { display: none; }
+.pipe-stage:last-child::after { display: none; }
+.pipe-stage.done::before, .pipe-stage.done::after { background: var(--accent); }
+
+.pipe-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--border); border: 2px solid var(--border);
+  margin: 0 auto 3px; display: flex; align-items: center;
+  justify-content: center; font-size: 8px;
+  position: relative; z-index: 1;
+}
+
+.pipe-stage.done .pipe-dot { background: var(--accent); border-color: var(--accent); color: #fff; }
+.pipe-stage.current .pipe-dot {
+  background: #fff; border-color: var(--accent); color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-light);
+}
+
+.pipe-label { font-size: 8px; color: var(--muted); line-height: 1.2; }
+.pipe-stage.done .pipe-label, .pipe-stage.current .pipe-label { color: var(--accent); font-weight: 700; }
+
+/* BILLING */
+.billing-section-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin: 20px 0 10px; padding-bottom: 8px;
+  border-bottom: 2px solid var(--accent-mid);
+}
+
+.data-table {
+  width: 100%; border-collapse: collapse;
+  background: var(--surface); border-radius: var(--radius-lg);
+  overflow: hidden; box-shadow: var(--shadow);
+  margin-bottom: 20px;
+}
+
+.data-table th {
+  font-size: 10px; font-weight: 700; color: var(--muted);
+  text-transform: uppercase; letter-spacing: .5px;
+  padding: 10px 12px; text-align: left;
+  background: var(--surface2); border-bottom: 2px solid var(--border);
+  white-space: nowrap;
+}
+
+.data-table td {
+  padding: 10px 12px; border-bottom: 1px solid var(--border);
+  font-size: 12px;
+}
+
+.data-table tr:last-child td { border-bottom: none; }
+
+.data-table .total-row td {
+  font-weight: 700; color: var(--accent);
+  background: var(--accent-light);
+}
+
+.table-wrap-scroll { overflow-x: auto; }
+
+/* SETTINGS */
+.settings-card {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 20px;
+  margin-bottom: 16px; box-shadow: var(--shadow);
+}
+
+.settings-card-title {
+  font-size: 14px; font-weight: 700; color: var(--text);
+  margin-bottom: 14px; padding-bottom: 10px;
+  border-bottom: 1px solid var(--border);
+}
+
+.people-list { margin-bottom: 12px; }
+
+.person-row {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 12px; background: var(--surface2);
+  border: 1px solid var(--border); border-radius: 8px;
+  margin-bottom: 6px; font-size: 13px;
+}
+
+.person-name { font-weight: 500; }
+.person-role { font-size: 11px; color: var(--muted); margin-top: 1px; }
+.person-delete {
+  background: none; border: none; cursor: pointer;
+  color: var(--danger); font-size: 14px; padding: 2px 6px;
+  border-radius: 6px; transition: background .12s;
+}
+.person-delete:hover { background: var(--danger-light); }
+
+.add-person-row {
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+}
+
+.sheets-guide {
+  background: var(--surface2); border: 1px solid var(--border);
+  border-radius: 8px; padding: 12px 14px;
+  font-size: 12px; color: var(--muted); margin-top: 12px;
+  line-height: 1.8;
+}
+
+.sheets-guide a { color: var(--accent); }
+.sheets-guide code {
+  background: var(--border); padding: 1px 5px;
+  border-radius: 4px; font-family: 'JetBrains Mono', monospace;
+  font-size: 11px;
+}
+
+.sync-status {
+  font-size: 12px; color: var(--muted);
+  display: flex; align-items: center; gap: 6px;
+}
+
+/* TOAST */
+#toast {
+  position: fixed; bottom: 24px; right: 24px;
+  background: var(--text); color: #fff;
+  padding: 12px 18px; border-radius: 10px;
+  font-size: 13px; font-weight: 500;
+  box-shadow: var(--shadow-lg); z-index: 9998;
+  transform: translateY(80px); opacity: 0;
+  transition: all .25s; pointer-events: none;
+  max-width: 320px;
+}
+
+#toast.show { transform: translateY(0); opacity: 1; }
+#toast.success { background: var(--success); }
+#toast.error { background: var(--danger); }
+#toast.warn { background: var(--warn); }
+
+/* EMPTY STATE */
+.empty-state {
+  text-align: center; padding: 48px 24px; color: var(--muted);
+}
+
+.empty-icon { font-size: 40px; margin-bottom: 12px; }
+.empty-text { font-size: 14px; }
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  #sidebar {
+    transform: translateX(-100%);
+  }
+
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
+  #sidebarOverlay.show { display: block; }
+
+  .topbar { display: flex; }
+
+  #mainContent {
+    margin-left: 0;
+    padding: 74px 14px 48px;
+  }
+
+  .form-grid { grid-template-columns: 1fr; }
+  .dash-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .filter-bar .field-input { min-width: 100%; }
+  .info-grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 480px) {
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+  .form-actions { flex-direction: column; }
+  .form-actions .btn { width: 100%; justify-content: center; }
+  .page-title { font-size: 17px; }
+}
+
+</style>
+</head>
+<body>
+
+<!-- ══════════ LOCK SCREEN ══════════ -->
+<div id="lockScreen">
+  <div class="lock-wrap">
+    <div class="lock-logo">🦷</div>
+    <h1 class="lock-clinic">SmileXpert Dental Clinic</h1>
+    <p class="lock-address">Harsh Sankul · Opp. RLT Science College · Civil Line · Akola – 444 001</p>
+    <div class="lock-card">
+      <label class="field-label">Select Your Role</label>
+      <select id="lockRole" class="field-input" onchange="onRoleChange()">
+        <option value="">— Who are you? —</option>
+      </select>
+      <label class="field-label" style="margin-top:14px;">Enter PIN</label>
+      <div class="pin-dots" id="pinDots">
+        <div class="dot" id="d0"></div><div class="dot" id="d1"></div>
+        <div class="dot" id="d2"></div><div class="dot" id="d3"></div>
+      </div>
+      <div class="pin-pad">
+        <button class="pin-btn" onclick="pinPress('1')">1</button>
+        <button class="pin-btn" onclick="pinPress('2')">2</button>
+        <button class="pin-btn" onclick="pinPress('3')">3</button>
+        <button class="pin-btn" onclick="pinPress('4')">4</button>
+        <button class="pin-btn" onclick="pinPress('5')">5</button>
+        <button class="pin-btn" onclick="pinPress('6')">6</button>
+        <button class="pin-btn" onclick="pinPress('7')">7</button>
+        <button class="pin-btn" onclick="pinPress('8')">8</button>
+        <button class="pin-btn" onclick="pinPress('9')">9</button>
+        <button class="pin-btn ghost" onclick="pinPress('0')" style="grid-column:2">0</button>
+        <button class="pin-btn del" onclick="pinDel()">⌫</button>
+      </div>
+      <div class="pin-error" id="pinError"></div>
+      <div class="pin-hint" id="pinHint"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════ APP SHELL ══════════ -->
+<div id="appShell" style="display:none;">
+
+  <!-- SIDEBAR -->
+  <aside id="sidebar">
+    <div class="sidebar-brand">
+      <span class="brand-icon">🦷</span>
+      <div>
+        <div class="brand-name">SmileXpert</div>
+        <div class="brand-sub">Lab Tracker</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard',this)">
+        <span class="nav-icon">📊</span><span>Dashboard</span>
+      </button>
+      <button class="nav-item" data-tab="newjob" onclick="switchTab('newjob',this)">
+        <span class="nav-icon">➕</span><span>New Job</span>
+      </button>
+      <button class="nav-item" data-tab="update" onclick="switchTab('update',this)">
+        <span class="nav-icon">✏️</span><span>Update Job</span>
+      </button>
+      <button class="nav-item" data-tab="tracker" onclick="switchTab('tracker',this)">
+        <span class="nav-icon">📋</span><span>All Jobs</span>
+      </button>
+      <button class="nav-item nav-billing hidden" data-tab="billing" onclick="switchTab('billing',this)">
+        <span class="nav-icon">💰</span><span>Billing</span>
+      </button>
+      <button class="nav-item nav-admin hidden" data-tab="settings" onclick="switchTab('settings',this)">
+        <span class="nav-icon">⚙️</span><span>Settings</span>
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <div class="user-avatar" id="userAvatar">—</div>
+        <div>
+          <div class="user-name" id="userName">—</div>
+          <div class="user-role" id="userRole">—</div>
+        </div>
+      </div>
+      <button class="lock-btn" onclick="logout()">🔒</button>
+    </div>
+  </aside>
+
+  <!-- MOBILE TOPBAR -->
+  <div class="topbar">
+    <button class="menu-btn" onclick="toggleSidebar()">☰</button>
+    <span class="topbar-title">SmileXpert Lab Tracker</span>
+    <button class="lock-btn-top" onclick="logout()">🔒</button>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main id="mainContent">
+
+    <!-- ── DASHBOARD ── -->
+    <div id="tab-dashboard" class="tab-pane active">
+      <div class="page-header">
+        <h2 class="page-title">Dashboard</h2>
+        <div class="page-date" id="todayDate"></div>
+      </div>
+      <div class="stats-grid" id="statsGrid"></div>
+      <div class="dash-grid">
+        <div>
+          <h3 class="section-heading">⚡ Action Required</h3>
+          <div id="actionList"></div>
+        </div>
+        <div>
+          <h3 class="section-heading">🕐 Due / Overdue</h3>
+          <div id="overdueList"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── NEW JOB ── -->
+    <div id="tab-newjob" class="tab-pane">
+      <div class="page-header">
+        <h2 class="page-title">New Lab Job</h2>
+      </div>
+
+      <!-- Step 1 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="step-chip">Step 1</div>
+          <span>Patient Registration — <em>Receptionist</em></span>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">Patient Full Name *</label>
+            <input class="field-input" id="n_patientName" type="text" placeholder="e.g. Ramesh Sharma">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Mobile Number *</label>
+            <input class="field-input" id="n_mobile" type="tel" placeholder="10-digit number">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Bestosys Patient ID</label>
+            <input class="field-input" id="n_bestosysId" type="text" placeholder="e.g. BES-00421">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Date of Visit</label>
+            <input class="field-input" id="n_visitDate" type="date">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Checked In By *</label>
+            <select class="field-input" id="n_receptionist"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Referred By / Source</label>
+            <input class="field-input" id="n_refDoc" type="text" placeholder="Self / Dr. Name">
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2 -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="step-chip">Step 2</div>
+          <span>Clinical Details — <em>Doctor</em></span>
+        </div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">Doctor *</label>
+            <select class="field-input" id="n_doctor"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Tooth Number(s) *</label>
+            <input class="field-input" id="n_tooth" type="text" placeholder="e.g. 11,12 or 14-16">
+          </div>
+          <div class="field-group">
+            <label class="field-label">Work Type *</label>
+            <select class="field-input" id="n_workType">
+              <option value="">— Select —</option>
+              <option>Crown</option><option>Bridge</option><option>Inlay</option><option>Onlay</option>
+              <option>Veneer</option><option>Implant Crown</option><option>RPD</option>
+              <option>Complete Denture (CD)</option><option>Night Guard 1mm</option>
+              <option>Night Guard 1.5mm</option><option>Other</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Impression Type</label>
+            <select class="field-input" id="n_impression">
+              <option value="">— Select —</option>
+              <option>Alginate</option><option>Putty Impression</option>
+              <option>PVS / Addition Silicone</option><option>Intraoral Scan (IOS)</option>
+            </select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Lab *</label>
+            <select class="field-input" id="n_lab"></select>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Expected Return Date</label>
+            <input class="field-input" id="n_expectedReturn" type="date">
+          </div>
+          <div class="field-group full">
+            <label class="field-label">Special Instructions for Lab</label>
+            <textarea class="field-input" id="n_instructions" rows="3" placeholder="Translucency, staining, contact points, custom notes..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Units Table -->
+      <div class="form-card">
+        <div class="form-card-header">
+          <div class="step-chip">Step 3</div>
+          <span>Material & Units Breakdown</span>
+        </div>
+        <div class="table-wrap">
+          <table class="units-tbl" id="unitsTable">
+            <thead>
+              <tr>
+                <th>Material</th>
+                <th>Shade</th>
+                <th>Crowns</th>
+                <th>Pontics</th>
+                <th>Total Units</th>
+                <th>Rate / Unit (₹)</th>
+                <th>Amount (₹)</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="unitsBody"></tbody>
+          </table>
+        </div>
+        <button class="add-row-btn" onclick="addUnitRow()">+ Add Material Row</button>
+        <div class="units-summary" id="unitsSummary">Total: 0 units · ₹0</div>
+      </div>
+
+      <div class="form-actions">
+        <button class="btn btn-primary" onclick="createJob()">✅ Create Job & Generate ID</button>
+        <button class="btn btn-ghost" onclick="clearNewJobForm()">🗑 Clear</button>
+      </div>
+
+      <div id="jobCreatedBox" class="job-created-box" style="display:none;">
+        <div>
+          <div class="jcb-label">Job Created! Write this ID on the envelope:</div>
+          <div class="jcb-id" id="jcbId">—</div>
+        </div>
+        <button class="btn btn-sm btn-outline" onclick="copyJobId()">📋 Copy ID</button>
+      </div>
+    </div>
+
+    <!-- ── UPDATE JOB ── -->
+    <div id="tab-update" class="tab-pane">
+      <div class="page-header">
+        <h2 class="page-title">Update Job</h2>
+      </div>
+      <div class="search-row">
+        <input class="field-input" id="searchQ" placeholder="Job ID  or  Patient Name  or  Mobile number...">
+        <button class="btn btn-primary" onclick="searchJob()">🔍 Find</button>
+      </div>
+      <div id="updatePanel" style="display:none;">
+        <div class="update-header">
+          <div>
+            <div class="up-job-id" id="up_id">—</div>
+            <div class="up-patient" id="up_patient">—</div>
+          </div>
+          <span class="status-badge" id="up_badge">—</span>
+        </div>
+
+        <!-- Basic info readonly -->
+        <div class="info-grid" id="up_infoGrid"></div>
+        <!-- Units summary -->
+        <div id="up_unitsSummary" class="units-readonly"></div>
+
+        <!-- Editable fields -->
+        <div class="update-section">
+          <div class="update-section-title">✏️ Edit Basic Details</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Patient Name</label>
+              <input class="field-input" id="up_patientName" type="text">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Mobile</label>
+              <input class="field-input" id="up_mobile" type="tel">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Doctor</label>
+              <select class="field-input" id="up_doctor"></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Lab</label>
+              <select class="field-input" id="up_lab"></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Tooth Number(s)</label>
+              <input class="field-input" id="up_tooth" type="text">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Expected Return</label>
+              <input class="field-input" id="up_expectedReturn" type="date">
+            </div>
+            <div class="field-group full">
+              <label class="field-label">Instructions</label>
+              <textarea class="field-input" id="up_instructions" rows="2"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="update-section">
+          <div class="update-section-title">🧱 Stage 3 — Cast Pouring</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Poured By</label>
+              <select class="field-input" id="up_castBy"><option value="">— Select —</option></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Date & Time</label>
+              <input class="field-input" id="up_castTime" type="datetime-local">
+            </div>
+            <div class="field-group full">
+              <label class="field-label">Cast Notes</label>
+              <input class="field-input" id="up_castNotes" type="text" placeholder="Any cast quality issues?">
+            </div>
+          </div>
+        </div>
+
+        <div class="update-section">
+          <div class="update-section-title">🚴 Stage 4 — Dispatched to Lab</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Dispatched By</label>
+              <input class="field-input" id="up_dispatchBy" type="text" placeholder="Courier / staff name">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Dispatch Date & Time</label>
+              <input class="field-input" id="up_dispatchTime" type="datetime-local">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Challan / Receipt No.</label>
+              <input class="field-input" id="up_challan" type="text" placeholder="Lab challan number">
+            </div>
+          </div>
+        </div>
+
+        <div class="update-section">
+          <div class="update-section-title">📦 Stage 5 — Work Received from Lab</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Received By</label>
+              <select class="field-input" id="up_receivedBy"><option value="">— Select —</option></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Date Received</label>
+              <input class="field-input" id="up_receivedDate" type="date">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Quality Check</label>
+              <select class="field-input" id="up_quality">
+                <option value="">— Select —</option>
+                <option>✅ Acceptable</option>
+                <option>⚠️ Minor Issue – See Notes</option>
+                <option>❌ Rejected – Sent Back</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Lab Invoice Amount (₹)</label>
+              <input class="field-input" id="up_labAmount" type="number" placeholder="e.g. 1800">
+            </div>
+            <div class="field-group full">
+              <label class="field-label">Quality Notes</label>
+              <input class="field-input" id="up_qualityNotes" type="text" placeholder="Shade / fit / finish issue?">
+            </div>
+          </div>
+        </div>
+
+        <div class="update-section">
+          <div class="update-section-title">📞 Stage 6 — Patient Informed</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Called By</label>
+              <select class="field-input" id="up_calledBy"><option value="">— Select —</option></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Call Date & Time</label>
+              <input class="field-input" id="up_callTime" type="datetime-local">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Patient Response</label>
+              <select class="field-input" id="up_callResponse">
+                <option value="">— Select —</option>
+                <option>✅ Appointment Fixed</option>
+                <option>📅 Will Call Back</option>
+                <option>📵 Not Reachable – Try Again</option>
+                <option>❌ Patient Cancelled</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Appointment Date</label>
+              <input class="field-input" id="up_appointmentDate" type="date">
+            </div>
+          </div>
+        </div>
+
+        <div class="update-section">
+          <div class="update-section-title">🦷 Stage 7 — Cementation</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Cemented By</label>
+              <select class="field-input" id="up_cementDoctor"></select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Cementation Date</label>
+              <input class="field-input" id="up_cementDate" type="date">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Patient Payment (₹)</label>
+              <input class="field-input" id="up_patientPayment" type="number" placeholder="Amount collected">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Payment Mode</label>
+              <select class="field-input" id="up_paymentMode">
+                <option value="">— Select —</option>
+                <option>Cash</option><option>UPI / GPay</option><option>Card</option>
+                <option>Insurance</option><option>Credit / Pending</option>
+              </select>
+            </div>
+            <div class="field-group full">
+              <label class="field-label">Cementation Notes</label>
+              <input class="field-input" id="up_cementNotes" type="text" placeholder="Adjustments / remakes / issues?">
+            </div>
+          </div>
+        </div>
+
+        <!-- Billing — Admin only -->
+        <div class="update-section billing-section-block" id="billingBlock" style="display:none;">
+          <div class="update-section-title">💰 Stage 8 — Lab Bill Verification (Admin Only)</div>
+          <div class="form-grid">
+            <div class="field-group">
+              <label class="field-label">Verified By</label>
+              <input class="field-input" id="up_billVerifiedBy" type="text">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Verification Date</label>
+              <input class="field-input" id="up_billDate" type="date">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Billing Status</label>
+              <select class="field-input" id="up_billStatus">
+                <option value="">— Select —</option>
+                <option>✅ Verified & Paid to Lab</option>
+                <option>⚠️ Dispute – Amount Mismatch</option>
+                <option>🕐 Pending Month End</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label class="field-label">Final Amount Paid (₹)</label>
+              <input class="field-input" id="up_finalLabPaid" type="number">
+            </div>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button class="btn btn-primary" onclick="saveUpdate()">💾 Save Changes</button>
+          <button class="btn btn-ghost" onclick="closeUpdate()">✖ Close</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── ALL JOBS ── -->
+    <div id="tab-tracker" class="tab-pane">
+      <div class="page-header">
+        <h2 class="page-title">All Jobs</h2>
+        <button class="btn btn-sm btn-outline" onclick="exportCSV()">⬇ Export CSV</button>
+      </div>
+      <div class="filter-bar">
+        <input class="field-input" id="ftText" placeholder="Search name / ID / lab / doctor..." oninput="renderTracker()">
+        <select class="field-input" id="ftStatus" onchange="renderTracker()">
+          <option value="">All Status</option>
+          <option value="registered">Registered</option>
+          <option value="impression">Impression</option>
+          <option value="cast">Cast</option>
+          <option value="dispatched">Dispatched</option>
+          <option value="received">Received</option>
+          <option value="called">Called</option>
+          <option value="cemented">Cemented</option>
+          <option value="billed">Billed</option>
+        </select>
+        <select class="field-input" id="ftLab" onchange="renderTracker()">
+          <option value="">All Labs</option>
+        </select>
+        <select class="field-input" id="ftDoctor" onchange="renderTracker()">
+          <option value="">All Doctors</option>
+        </select>
+      </div>
+      <div id="trackerList"></div>
+    </div>
+
+    <!-- ── BILLING ── -->
+    <div id="tab-billing" class="tab-pane">
+      <div class="page-header">
+        <h2 class="page-title">Billing Report</h2>
+      </div>
+      <div class="filter-bar">
+        <select class="field-input" id="bMonth" onchange="renderBilling()">
+          <option value="0">January</option><option value="1">February</option><option value="2">March</option>
+          <option value="3">April</option><option value="4">May</option><option value="5">June</option>
+          <option value="6">July</option><option value="7">August</option><option value="8">September</option>
+          <option value="9">October</option><option value="10">November</option><option value="11">December</option>
+        </select>
+        <input class="field-input" id="bYear" type="number" value="2026" style="width:90px;" onchange="renderBilling()">
+        <select class="field-input" id="bLab" onchange="renderBilling()">
+          <option value="">All Labs</option>
+        </select>
+      </div>
+      <div id="billingContent"></div>
+    </div>
+
+    <!-- ── SETTINGS ── -->
+    <div id="tab-settings" class="tab-pane">
+      <div class="page-header">
+        <h2 class="page-title">Settings</h2>
+      </div>
+
+      <!-- Receptionists -->
+      <div class="settings-card">
+        <div class="settings-card-title">🗂 Receptionists</div>
+        <div id="receptionistList" class="people-list"></div>
+        <div class="add-person-row">
+          <input class="field-input" id="newReceptionist" placeholder="Full name" style="flex:1;">
+          <button class="btn btn-sm btn-primary" onclick="addPerson('receptionist')">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Doctors -->
+      <div class="settings-card">
+        <div class="settings-card-title">🩺 Doctors</div>
+        <div id="doctorList" class="people-list"></div>
+        <div class="add-person-row">
+          <input class="field-input" id="newDoctor" placeholder="Full name with title (e.g. Dr. Name)" style="flex:1;">
+          <select class="field-input" id="newDoctorRole" style="width:160px;">
+            <option value="principal">Principal Doctor</option>
+            <option value="doctor">Assistant Doctor</option>
+          </select>
+          <button class="btn btn-sm btn-primary" onclick="addPerson('doctor')">+ Add</button>
+        </div>
+      </div>
+
+      <!-- Labs -->
+      <div class="settings-card">
+        <div class="settings-card-title">🏭 Labs</div>
+        <div id="labList" class="people-list"></div>
+        <div class="add-person-row">
+          <input class="field-input" id="newLab" placeholder="Lab name" style="flex:1;">
+          <button class="btn btn-sm btn-primary" onclick="addPerson('lab')">+ Add</button>
+        </div>
+      </div>
+
+      <!-- PINs -->
+      <div class="settings-card">
+        <div class="settings-card-title">🔒 Change PINs</div>
+        <div class="form-grid">
+          <div class="field-group">
+            <label class="field-label">Admin PIN (Dr. Asif only)</label>
+            <div style="display:flex;gap:8px;">
+              <input class="field-input" id="pinAdmin" type="password" placeholder="New PIN" maxlength="4" style="flex:1;">
+              <button class="btn btn-sm btn-outline" onclick="changePin('admin')">Save</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Doctor PIN</label>
+            <div style="display:flex;gap:8px;">
+              <input class="field-input" id="pinDoctor" type="password" placeholder="New PIN" maxlength="4" style="flex:1;">
+              <button class="btn btn-sm btn-outline" onclick="changePin('doctor')">Save</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Receptionist PIN</label>
+            <div style="display:flex;gap:8px;">
+              <input class="field-input" id="pinReceptionist" type="password" placeholder="New PIN" maxlength="4" style="flex:1;">
+              <button class="btn btn-sm btn-outline" onclick="changePin('receptionist')">Save</button>
+            </div>
+          </div>
+          <div class="field-group">
+            <label class="field-label">Staff PIN</label>
+            <div style="display:flex;gap:8px;">
+              <input class="field-input" id="pinStaff" type="password" placeholder="New PIN" maxlength="4" style="flex:1;">
+              <button class="btn btn-sm btn-outline" onclick="changePin('staff')">Save</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Google Sheets Sync -->
+      <div class="settings-card">
+        <div class="settings-card-title">🔗 Google Sheets Sync</div>
+        <p style="font-size:13px;color:var(--muted);margin-bottom:12px;">Paste your Google Apps Script Web App URL below to enable cloud sync across all devices.</p>
+        <div style="display:flex;gap:8px;">
+          <input class="field-input" id="sheetsUrl" placeholder="https://script.google.com/macros/s/..." style="flex:1;">
+          <button class="btn btn-sm btn-primary" onclick="saveSheetsUrl()">Save URL</button>
+        </div>
+        <div style="margin-top:10px;display:flex;gap:8px;">
+          <button class="btn btn-sm btn-outline" onclick="syncToSheets()">☁ Sync Now</button>
+          <div class="sync-status" id="syncStatus"></div>
+        </div>
+        <div class="sheets-guide">
+          <strong>Setup guide:</strong><br>
+          1. Open <a href="https://sheets.google.com" target="_blank">sheets.google.com</a> → New Sheet → Name it "SmileXpert Lab Tracker"<br>
+          2. Extensions → Apps Script → Paste the script from <code>google-apps-script.js</code> included in this package<br>
+          3. Deploy → New deployment → Web app → Execute as Me → Anyone → Deploy<br>
+          4. Copy the URL and paste above
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+</div>
+
+<!-- OVERLAY -->
+<div id="sidebarOverlay" onclick="closeSidebar()"></div>
+
+<!-- TOAST -->
+<div id="toast"></div>
+
+
+<script>
+/* ════════════════════════════════════════
+   SmileXpert Lab Tracker — App Logic
+   ════════════════════════════════════════ */
+
+'use strict';
+
+// ══════════ DEFAULT DATA ══════════
+const DEFAULTS = {
+  pins: { admin: '5617', doctor: '2345', receptionist: '3456', staff: '3456' },
+  receptionists: [
+    { id: 'r1', name: 'Mrs. Pooja Daberao', role: 'receptionist' },
+    { id: 'r2', name: 'Payal', role: 'receptionist' }
+  ],
+  doctors: [
+    { id: 'd1', name: 'Dr. Asif Halari', role: 'admin', type: 'principal' },
+    { id: 'd2', name: 'Dr. Shamima Halari', role: 'doctor', type: 'principal' },
+    { id: 'd3', name: 'Dr. Hina Tamkenat', role: 'doctor', type: 'assistant' },
+    { id: 'd4', name: 'Dr. Akansha Bellani', role: 'doctor', type: 'assistant' },
+    { id: 'd5', name: 'Dr. Taskeen Abdul', role: 'doctor', type: 'assistant' },
+    { id: 'd6', name: 'Dr. Aayesha', role: 'doctor', type: 'assistant' }
+  ],
+  labs: [
+    { id: 'l1', name: 'Advance Dental Lab' },
+    { id: 'l2', name: 'Gurukripa Dental Lab' },
+    { id: 'l3', name: 'Sharad Damre Lab' },
+    { id: 'l4', name: 'Ashish Dental Lab' }
+  ]
+};
+
+const MATERIALS = [
+  'Full Metal', 'Ceramic Facing', 'PFM (Porcelain Fused Metal)',
+  'DMLS 10 Year', 'DMLS 15 Year',
+  'Zirconia Monolithic', 'Zirconia with Layering',
+  'E.max (LDS)', 'Implant Crown DMLS', 'Implant Crown Zirconia',
+  'Night Guard', 'Retainer', 'Acrylic', 'PMMA', 'Flexible', 'Other'
+];
+
+const SHADES = [
+  'A1','A2','A3','A3.5','A4',
+  'B1','B2','B3','B4',
+  'C1','C2','C3','C4',
+  'D2','D3','D4',
+  'BL1 (Bleach)','BL2 (Bleach)',
+  'Custom / Photo'
+];
+
+const STAGES = [
+  { key: 'registered', label: 'Reg.' },
+  { key: 'impression', label: 'Imp.' },
+  { key: 'cast', label: 'Cast' },
+  { key: 'dispatched', label: 'Sent' },
+  { key: 'received', label: 'Rcvd' },
+  { key: 'called', label: 'Called' },
+  { key: 'cemented', label: 'Cemented' },
+  { key: 'billed', label: 'Billed' }
+];
+
+// ══════════ STATE ══════════
+let DB = {
+  jobs: [],
+  pins: { ...DEFAULTS.pins },
+  receptionists: [...DEFAULTS.receptionists],
+  doctors: [...DEFAULTS.doctors],
+  labs: [...DEFAULTS.labs],
+  sheetsUrl: ''
+};
+
+let currentRole = '';
+let currentUser = '';
+let currentJobIndex = -1;
+let pinBuffer = '';
+let unitRows = [];
+
+// ══════════ INIT ══════════
+function init() {
+  loadDB();
+  buildLockDropdown();
+  setTodayDefaults();
+  document.getElementById('todayDate').textContent =
+    new Date().toLocaleDateString('en-IN', { weekday:'long', year:'numeric', month:'long', day:'numeric' });
+}
+
+function loadDB() {
+  const saved = localStorage.getItem('smilexpert_db');
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+      DB = { ...DB, ...parsed };
+    } catch(e) { /* use defaults */ }
+  }
+}
+
+function saveDB() {
+  localStorage.setItem('smilexpert_db', JSON.stringify(DB));
+}
+
+function setTodayDefaults() {
+  const today = new Date().toISOString().split('T')[0];
+  const ret = new Date();
+  // Add 8 days (approx 6 working days)
+  ret.setDate(ret.getDate() + 8);
+  const retStr = ret.toISOString().split('T')[0];
+  const visitEl = document.getElementById('n_visitDate');
+  const retEl = document.getElementById('n_expectedReturn');
+  if (visitEl) visitEl.value = today;
+  if (retEl) retEl.value = retStr;
+}
+
+// ══════════ LOCK SCREEN ══════════
+function buildLockDropdown() {
+  const sel = document.getElementById('lockRole');
+  sel.innerHTML = '<option value="">— Who are you? —</option>';
+
+  // Admin
+  const adminDoc = DB.doctors.find(d => d.role === 'admin');
+  if (adminDoc) {
+    const g1 = document.createElement('optgroup');
+    g1.label = '👑 Admin';
+    const opt = document.createElement('option');
+    opt.value = `admin|${adminDoc.id}|${adminDoc.name}`;
+    opt.textContent = adminDoc.name;
+    g1.appendChild(opt);
+    sel.appendChild(g1);
+  }
+
+  // Doctors
+  const docs = DB.doctors.filter(d => d.role === 'doctor');
+  if (docs.length) {
+    const g2 = document.createElement('optgroup');
+    g2.label = '🩺 Doctors';
+    docs.forEach(d => {
+      const opt = document.createElement('option');
+      opt.value = `doctor|${d.id}|${d.name}`;
+      opt.textContent = d.name;
+      g2.appendChild(opt);
+    });
+    sel.appendChild(g2);
+  }
+
+  // Receptionists
+  if (DB.receptionists.length) {
+    const g3 = document.createElement('optgroup');
+    g3.label = '🗂 Receptionists';
+    DB.receptionists.forEach(r => {
+      const opt = document.createElement('option');
+      opt.value = `receptionist|${r.id}|${r.name}`;
+      opt.textContent = r.name;
+      g3.appendChild(opt);
+    });
+    sel.appendChild(g3);
+  }
+
+  // Staff
+  const g4 = document.createElement('optgroup');
+  g4.label = '💺 Staff';
+  const opt = document.createElement('option');
+  opt.value = 'staff|staff|Staff Member';
+  opt.textContent = 'Staff / Assistant';
+  g4.appendChild(opt);
+  sel.appendChild(g4);
+}
+
+function onRoleChange() {
+  const val = document.getElementById('lockRole').value;
+  const hint = document.getElementById('pinHint');
+  pinBuffer = ''; updateDots();
+  document.getElementById('pinError').textContent = '';
+
+  if (!val) { hint.textContent = ''; return; }
+
+  const role = val.split('|')[0];
+  if (role === 'admin') {
+    hint.textContent = 'Enter your Admin PIN';
+  } else if (role === 'doctor') {
+    hint.textContent = `Doctor PIN: ${DB.pins.doctor}`;
+  } else if (role === 'receptionist') {
+    hint.textContent = `Receptionist PIN: ${DB.pins.receptionist}`;
+  } else {
+    hint.textContent = `Staff PIN: ${DB.pins.staff}`;
+  }
+}
+
+function pinPress(d) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += d;
+  updateDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 150);
+}
+
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0, -1);
+  updateDots();
+}
+
+function updateDots() {
+  for (let i = 0; i < 4; i++) {
+    document.getElementById('d' + i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+
+function checkPin() {
+  const val = document.getElementById('lockRole').value;
+  if (!val) {
+    document.getElementById('pinError').textContent = 'Please select your role first.';
+    pinBuffer = ''; updateDots(); return;
+  }
+
+  const [role, id, name] = val.split('|');
+  const correctPin = DB.pins[role] || DB.pins.staff;
+
+  if (pinBuffer === correctPin) {
+    currentRole = role;
+    currentUser = name;
+    document.getElementById('lockScreen').style.display = 'none';
+    document.getElementById('appShell').style.display = 'flex';
+
+    // Set user info
+    document.getElementById('userAvatar').textContent = name.charAt(name.indexOf(' ') + 1) || name.charAt(0);
+    document.getElementById('userName').textContent = name;
+    document.getElementById('userRole').textContent = role.charAt(0).toUpperCase() + role.slice(1);
+
+    applyRoleRestrictions();
+    populateDropdowns();
+    renderDashboard();
+  } else {
+    document.getElementById('pinError').textContent = '❌ Wrong PIN. Try again.';
+    pinBuffer = ''; updateDots();
+  }
+}
+
+function logout() {
+  currentRole = ''; currentUser = ''; pinBuffer = '';
+  document.getElementById('lockRole').value = '';
+  document.getElementById('pinHint').textContent = '';
+  document.getElementById('pinError').textContent = '';
+  updateDots();
+  document.getElementById('appShell').style.display = 'none';
+  document.getElementById('lockScreen').style.display = 'flex';
+  // Close sidebar on mobile
+  closeSidebar();
+}
+
+function applyRoleRestrictions() {
+  const isAdmin = currentRole === 'admin';
+  const isDoctor = currentRole === 'doctor' || isAdmin;
+
+  document.querySelectorAll('.nav-billing').forEach(el => el.classList.toggle('hidden', !isAdmin));
+  document.querySelectorAll('.nav-admin').forEach(el => el.classList.toggle('hidden', !isAdmin));
+
+  if (document.getElementById('billingBlock')) {
+    document.getElementById('billingBlock').style.display = isAdmin ? 'block' : 'none';
+  }
+}
+
+// ══════════ NAVIGATION ══════════
+function switchTab(tab, el) {
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  if (el) el.classList.add('active');
+  closeSidebar();
+
+  if (tab === 'dashboard') renderDashboard();
+  if (tab === 'tracker') renderTracker();
+  if (tab === 'billing') {
+    document.getElementById('bMonth').value = new Date().getMonth();
+    populateBillingLabFilter();
+    renderBilling();
+  }
+  if (tab === 'settings') renderSettings();
+  if (tab === 'newjob') { clearNewJobForm(); populateDropdowns(); }
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+  document.getElementById('sidebarOverlay').classList.toggle('show');
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('sidebarOverlay').classList.remove('show');
+}
+
+// ══════════ DROPDOWNS ══════════
+function populateDropdowns() {
+  // Receptionist dropdown
+  fillSelect('n_receptionist', DB.receptionists.map(r => r.name), '— Select —');
+
+  // Doctor dropdowns
+  const doctorNames = DB.doctors.map(d => d.name);
+  fillSelect('n_doctor', doctorNames, '— Select Doctor —');
+  fillSelect('up_doctor', doctorNames, '— Select Doctor —');
+  fillSelect('up_cementDoctor', doctorNames, '— Select Doctor —');
+
+  // Lab dropdowns
+  const labNames = DB.labs.map(l => l.name);
+  fillSelect('n_lab', labNames, '— Select Lab —');
+  fillSelect('up_lab', labNames, '— Select Lab —');
+
+  // Staff for update stages
+  const allStaff = [
+    ...DB.receptionists.map(r => r.name),
+    ...DB.doctors.map(d => d.name)
+  ];
+  fillSelect('up_castBy', allStaff, '— Select —');
+  fillSelect('up_receivedBy', allStaff, '— Select —');
+  fillSelect('up_calledBy', allStaff, '— Select —');
+
+  // Tracker filters
+  fillSelect('ftLab', DB.labs.map(l => l.name), '');
+  fillSelect('ftDoctor', DB.doctors.map(d => d.name), '');
+}
+
+function fillSelect(id, options, placeholder) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  const curr = el.value;
+  el.innerHTML = placeholder !== undefined ? `<option value="">${placeholder || 'All'}</option>` : '';
+  options.forEach(opt => {
+    const o = document.createElement('option');
+    o.value = opt; o.textContent = opt;
+    el.appendChild(o);
+  });
+  if (curr) el.value = curr;
+}
+
+// ══════════ UNITS TABLE ══════════
+function addUnitRow(mat = '', shade = '', crowns = 0, pontics = 0, rate = 0) {
+  const id = 'u' + Date.now() + Math.random().toString(36).slice(2, 6);
+  unitRows.push({ id, mat, shade, crowns: +crowns, pontics: +pontics, rate: +rate });
+  renderUnitRows();
+}
+
+function renderUnitRows() {
+  const tbody = document.getElementById('unitsBody');
+  if (!tbody) return;
+
+  tbody.innerHTML = unitRows.map(r => {
+    const total = (+r.crowns) + (+r.pontics);
+    const amt = total * (+r.rate);
+    const matOpts = MATERIALS.map(m => `<option ${r.mat === m ? 'selected' : ''}>${m}</option>`).join('');
+    const shadeOpts = SHADES.map(s => `<option ${r.shade === s ? 'selected' : ''}>${s}</option>`).join('');
+    return `<tr>
+      <td><select class="field-input" onchange="ur('${r.id}','mat',this.value)" style="min-width:170px;font-size:12px;padding:5px 8px;">
+        <option value="">— Select —</option>${matOpts}</select></td>
+      <td><select class="field-input" onchange="ur('${r.id}','shade',this.value)" style="min-width:110px;font-size:12px;padding:5px 8px;">
+        <option value="">—</option>${shadeOpts}</select></td>
+      <td><input class="field-input" type="number" min="0" value="${r.crowns}"
+        onchange="ur('${r.id}','crowns',this.value)" style="width:65px;padding:5px 8px;font-size:13px;"></td>
+      <td><input class="field-input" type="number" min="0" value="${r.pontics}"
+        onchange="ur('${r.id}','pontics',this.value)" style="width:65px;padding:5px 8px;font-size:13px;"></td>
+      <td class="units-total">${total}</td>
+      <td><input class="field-input" type="number" min="0" value="${r.rate}"
+        onchange="ur('${r.id}','rate',this.value)" style="width:80px;padding:5px 8px;font-size:13px;"></td>
+      <td class="units-amount">₹${amt.toLocaleString('en-IN')}</td>
+      <td><button class="del-unit-btn" onclick="delRow('${r.id}')">🗑</button></td>
+    </tr>`;
+  }).join('');
+
+  updateUnitSummary();
+}
+
+function ur(id, field, val) {
+  const r = unitRows.find(x => x.id === id);
+  if (r) { r[field] = (field === 'mat' || field === 'shade') ? val : +val; renderUnitRows(); }
+}
+
+function delRow(id) {
+  unitRows = unitRows.filter(r => r.id !== id);
+  renderUnitRows();
+}
+
+function updateUnitSummary() {
+  const tu = unitRows.reduce((s, r) => (+r.crowns) + (+r.pontics) + s, 0);
+  const ta = unitRows.reduce((s, r) => ((+r.crowns) + (+r.pontics)) * (+r.rate) + s, 0);
+  const el = document.getElementById('unitsSummary');
+  if (el) el.textContent = `Total: ${tu} units   ·   Estimated Lab Amount: ₹${ta.toLocaleString('en-IN')}`;
+}
+
+// ══════════ JOB ID ══════════
+function generateJobId() {
+  const d = new Date();
+  const ds = d.getFullYear() + String(d.getMonth() + 1).padStart(2, '0') + String(d.getDate()).padStart(2, '0');
+  const count = DB.jobs.filter(j => j.id.includes(ds)).length + 1;
+  return `LAB-${ds}-${String(count).padStart(3, '0')}`;
+}
+
+// ══════════ CREATE JOB ══════════
+function createJob() {
+  const name = g('n_patientName').trim();
+  const mobile = g('n_mobile').trim();
+  const rec = g('n_receptionist');
+
+  const errors = [];
+  if (!name) errors.push('n_patientName');
+  if (!mobile) errors.push('n_mobile');
+  if (!rec) errors.push('n_receptionist');
+
+  if (errors.length) {
+    errors.forEach(id => document.getElementById(id).style.borderColor = 'var(--danger)');
+    showToast('Please fill required fields (*)', 'error');
+    return;
+  }
+
+  errors.forEach(id => document.getElementById(id).style.borderColor = '');
+
+  const today = new Date().toISOString().split('T')[0];
+  const job = {
+    id: generateJobId(),
+    status: 'impression',
+    createdAt: new Date().toISOString(),
+    patientName: name,
+    mobile,
+    bestosysId: g('n_bestosysId'),
+    visitDate: g('n_visitDate') || today,
+    receptionistName: rec,
+    refDoc: g('n_refDoc'),
+    tooth: g('n_tooth'),
+    workType: g('n_workType'),
+    impression: g('n_impression'),
+    lab: g('n_lab'),
+    expectedReturn: g('n_expectedReturn') || new Date(Date.now() + 8 * 864e5).toISOString().split('T')[0],
+    doctorName: g('n_doctor'),
+    instructions: g('n_instructions'),
+    units: JSON.parse(JSON.stringify(unitRows)),
+    // Stages
+    castBy: '', castTime: '', castNotes: '',
+    dispatchBy: '', dispatchTime: '', challan: '',
+    receivedBy: '', receivedDate: '', quality: '', labAmount: '', qualityNotes: '',
+    calledBy: '', callTime: '', callResponse: '', appointmentDate: '',
+    cementDate: '', cementDoctor: '', patientPayment: '', paymentMode: '', cementNotes: '',
+    billVerifiedBy: '', billDate: '', billStatus: '', finalLabPaid: ''
+  };
+
+  if (!job.tooth || !job.workType || !job.lab) job.status = 'registered';
+
+  DB.jobs.unshift(job);
+  saveDB();
+  syncToSheetsAuto(job);
+
+  document.getElementById('jcbId').textContent = job.id;
+  document.getElementById('jobCreatedBox').style.display = 'flex';
+  showToast(`✅ Job ${job.id} created!`, 'success');
+  clearNewJobForm(true);
+}
+
+function g(id) {
+  const el = document.getElementById(id);
+  return el ? el.value : '';
+}
+
+function clearNewJobForm(keepResult = false) {
+  ['n_patientName','n_mobile','n_bestosysId','n_visitDate','n_refDoc','n_receptionist',
+   'n_tooth','n_workType','n_impression','n_lab','n_expectedReturn','n_doctor','n_instructions']
+  .forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  unitRows = [];
+  renderUnitRows();
+  setTodayDefaults();
+  if (!keepResult) document.getElementById('jobCreatedBox').style.display = 'none';
+}
+
+function copyJobId() {
+  const id = document.getElementById('jcbId').textContent;
+  navigator.clipboard.writeText(id).then(() => showToast('📋 Job ID copied!'));
+}
+
+// ══════════ FIND & UPDATE ══════════
+function searchJob() {
+  const q = document.getElementById('searchQ').value.trim().toLowerCase();
+  if (!q) { showToast('Enter a job ID, name or mobile', 'warn'); return; }
+
+  const idx = DB.jobs.findIndex(j =>
+    j.id.toLowerCase() === q ||
+    j.patientName.toLowerCase().includes(q) ||
+    j.mobile.includes(q)
+  );
+
+  if (idx === -1) { showToast('❌ Job not found', 'error'); return; }
+  openUpdatePanel(idx);
+}
+
+function openUpdatePanel(idx) {
+  currentJobIndex = idx;
+  const j = DB.jobs[idx];
+  const panel = document.getElementById('updatePanel');
+  panel.style.display = 'block';
+
+  document.getElementById('up_id').textContent = j.id;
+  document.getElementById('up_patient').textContent = j.patientName;
+
+  const badge = document.getElementById('up_badge');
+  badge.textContent = getStatusLabel(j.status);
+  badge.className = 'status-badge s-' + j.status;
+
+  // Info grid
+  const tu = (j.units || []).reduce((s, r) => (+r.crowns) + (+r.pontics) + s, 0);
+  document.getElementById('up_infoGrid').innerHTML = [
+    ['Mobile', j.mobile],
+    ['Bestosys ID', j.bestosysId || '—'],
+    ['Visit Date', formatDate(j.visitDate)],
+    ['Receptionist', j.receptionistName || '—'],
+    ['Lab', j.lab || '—'],
+    ['Work Type', j.workType || '—'],
+    ['Total Units', tu],
+    ['Expected Return', formatDate(j.expectedReturn)],
+    ['Instructions', j.instructions || '—'],
+    ['Created', formatDateTime(j.createdAt)]
+  ].map(([l, v]) => `<div class="info-item"><div class="info-lbl">${l}</div><div class="info-val">${v}</div></div>`).join('');
+
+  // Units summary
+  const ta = (j.units || []).reduce((s, r) => ((+r.crowns) + (+r.pontics)) * (+r.rate) + s, 0);
+  document.getElementById('up_unitsSummary').innerHTML = `
+    <strong style="color:var(--accent);display:block;margin-bottom:8px;">🔢 Materials & Units:</strong>
+    ${(j.units || []).length
+      ? `<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;font-size:11px;">
+          <tr style="background:rgba(37,99,235,.08);">
+            <th style="padding:5px 8px;text-align:left;">Material</th>
+            <th style="padding:5px 8px;">Shade</th>
+            <th style="padding:5px 8px;">Crowns</th>
+            <th style="padding:5px 8px;">Pontics</th>
+            <th style="padding:5px 8px;">Units</th>
+            <th style="padding:5px 8px;">Rate</th>
+            <th style="padding:5px 8px;">Amount</th>
+          </tr>
+          ${(j.units || []).map(r => `<tr>
+            <td style="padding:5px 8px;">${r.mat || '—'}</td>
+            <td style="padding:5px 8px;text-align:center;">${r.shade || '—'}</td>
+            <td style="padding:5px 8px;text-align:center;">${r.crowns}</td>
+            <td style="padding:5px 8px;text-align:center;">${r.pontics}</td>
+            <td style="padding:5px 8px;text-align:center;font-weight:700;color:var(--accent);">${(+r.crowns) + (+r.pontics)}</td>
+            <td style="padding:5px 8px;text-align:center;">₹${r.rate}</td>
+            <td style="padding:5px 8px;font-weight:600;color:var(--success);">₹${((+r.crowns) + (+r.pontics)) * (+r.rate)}</td>
+          </tr>`).join('')}
+        </table></div>
+        <div style="margin-top:8px;font-weight:700;color:var(--accent);">Total: ${tu} units · Estimated ₹${ta.toLocaleString('en-IN')}</div>`
+      : 'No units recorded.'}`;
+
+  // Populate editable fields
+  populateDropdowns();
+  const fields = {
+    up_patientName: j.patientName,
+    up_mobile: j.mobile,
+    up_doctor: j.doctorName,
+    up_lab: j.lab,
+    up_tooth: j.tooth,
+    up_expectedReturn: j.expectedReturn,
+    up_instructions: j.instructions,
+    up_castBy: j.castBy, up_castTime: j.castTime, up_castNotes: j.castNotes,
+    up_dispatchBy: j.dispatchBy, up_dispatchTime: j.dispatchTime, up_challan: j.challan,
+    up_receivedBy: j.receivedBy, up_receivedDate: j.receivedDate, up_quality: j.quality,
+    up_labAmount: j.labAmount, up_qualityNotes: j.qualityNotes,
+    up_calledBy: j.calledBy, up_callTime: j.callTime, up_callResponse: j.callResponse,
+    up_appointmentDate: j.appointmentDate,
+    up_cementDoctor: j.cementDoctor, up_cementDate: j.cementDate,
+    up_patientPayment: j.patientPayment, up_paymentMode: j.paymentMode, up_cementNotes: j.cementNotes,
+    up_billVerifiedBy: j.billVerifiedBy, up_billDate: j.billDate,
+    up_billStatus: j.billStatus, up_finalLabPaid: j.finalLabPaid
+  };
+
+  Object.entries(fields).forEach(([id, val]) => {
+    const el = document.getElementById(id);
+    if (el) el.value = val || '';
+  });
+
+  document.getElementById('billingBlock').style.display = currentRole === 'admin' ? 'block' : 'none';
+  panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function saveUpdate() {
+  if (currentJobIndex === -1) return;
+  const j = DB.jobs[currentJobIndex];
+
+  // Basic editable
+  j.patientName = g('up_patientName') || j.patientName;
+  j.mobile = g('up_mobile') || j.mobile;
+  j.doctorName = g('up_doctor');
+  j.lab = g('up_lab');
+  j.tooth = g('up_tooth');
+  j.expectedReturn = g('up_expectedReturn');
+  j.instructions = g('up_instructions');
+
+  // Stages
+  const stageFields = [
+    'castBy','castTime','castNotes','dispatchBy','dispatchTime','challan',
+    'receivedBy','receivedDate','quality','labAmount','qualityNotes',
+    'calledBy','callTime','callResponse','appointmentDate',
+    'cementDate','cementDoctor','patientPayment','paymentMode','cementNotes',
+    'billVerifiedBy','billDate','billStatus','finalLabPaid'
+  ];
+
+  stageFields.forEach(f => { const el = document.getElementById('up_' + f); if (el) j[f] = el.value; });
+  j.status = computeStatus(j);
+  j.updatedAt = new Date().toISOString();
+
+  saveDB();
+  syncToSheetsAuto(j);
+
+  document.getElementById('up_badge').textContent = getStatusLabel(j.status);
+  document.getElementById('up_badge').className = 'status-badge s-' + j.status;
+  showToast(`💾 ${j.id} saved!`, 'success');
+}
+
+function closeUpdate() {
+  document.getElementById('updatePanel').style.display = 'none';
+  document.getElementById('searchQ').value = '';
+  currentJobIndex = -1;
+}
+
+function computeStatus(j) {
+  if (j.billStatus && j.billStatus.includes('Verified')) return 'billed';
+  if (j.cementDate) return 'cemented';
+  if (j.calledBy) return 'called';
+  if (j.receivedDate) return 'received';
+  if (j.dispatchTime) return 'dispatched';
+  if (j.castTime) return 'cast';
+  if (j.tooth && j.workType && j.lab) return 'impression';
+  return 'registered';
+}
+
+// ══════════ TRACKER ══════════
+function renderTracker() {
+  const ft = g('ftText').toLowerCase();
+  const fs = g('ftStatus');
+  const fl = g('ftLab');
+  const fd = g('ftDoctor');
+
+  const filtered = DB.jobs.filter(j => {
+    const mt = !ft || j.patientName.toLowerCase().includes(ft) ||
+      j.id.toLowerCase().includes(ft) ||
+      (j.lab || '').toLowerCase().includes(ft) ||
+      (j.mobile || '').includes(ft) ||
+      (j.doctorName || '').toLowerCase().includes(ft);
+    return mt && (!fs || j.status === fs) && (!fl || j.lab === fl) && (!fd || j.doctorName === fd);
+  });
+
+  // populate filter dropdowns
+  fillSelect('ftLab', DB.labs.map(l => l.name), '');
+  fillSelect('ftDoctor', DB.doctors.map(d => d.name), '');
+
+  const list = document.getElementById('trackerList');
+  if (!filtered.length) {
+    list.innerHTML = `<div class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">No jobs found</div></div>`;
+    return;
+  }
+
+  list.innerHTML = filtered.map(j => {
+    const isLate = j.expectedReturn && !j.receivedDate && new Date(j.expectedReturn) < new Date();
+    const tu = (j.units || []).reduce((s, r) => (+r.crowns) + (+r.pontics) + s, 0);
+    const mats = [...new Set((j.units || []).map(r => r.mat).filter(Boolean))].join(', ') || '—';
+    return `<div class="job-card" onclick="openJobCard('${j.id}')">
+      <div class="job-card-top">
+        <div>
+          <div class="job-card-id">${j.id}</div>
+          <div class="job-card-name">${j.patientName}</div>
+          <div class="job-card-meta">
+            📱 ${j.mobile} · 🦷 ${j.tooth || '—'} · ${j.workType || '—'} · ${tu} units<br>
+            🏭 ${j.lab || '—'} · 👨‍⚕️ ${j.doctorName || '—'} · ${mats}
+          </div>
+        </div>
+        <div class="job-card-right">
+          <span class="status-badge s-${j.status}">${getStatusLabel(j.status)}</span>
+          ${isLate ? '<br><span class="status-badge s-late" style="margin-top:5px;">⚠️ Late</span>' : ''}
+          <div class="job-card-meta" style="margin-top:6px;">Due: ${formatDate(j.expectedReturn)}</div>
+        </div>
+      </div>
+      <div class="pipeline">${renderPipeline(j.status)}</div>
+    </div>`;
+  }).join('');
+}
+
+function openJobCard(id) {
+  const idx = DB.jobs.findIndex(j => j.id === id);
+  if (idx === -1) return;
+  switchTab('update', document.querySelector('[data-tab="update"]'));
+  document.getElementById('searchQ').value = id;
+  openUpdatePanel(idx);
+}
+
+function renderPipeline(status) {
+  const ci = STAGES.map(s => s.key).indexOf(status);
+  return STAGES.map((s, i) => {
+    const cls = i < ci ? 'done' : i === ci ? 'current done' : '';
+    return `<div class="pipe-stage ${cls}">
+      <div class="pipe-dot">${i < ci ? '✓' : i + 1}</div>
+      <div class="pipe-label">${s.label}</div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════ DASHBOARD ══════════
+function renderDashboard() {
+  const total = DB.jobs.length;
+  const active = DB.jobs.filter(j => !['cemented', 'billed'].includes(j.status)).length;
+  const today = new Date().toISOString().split('T')[0];
+  const dueToday = DB.jobs.filter(j => j.expectedReturn === today && !j.receivedDate).length;
+  const late = DB.jobs.filter(j => j.expectedReturn && !j.receivedDate && new Date(j.expectedReturn) < new Date()).length;
+  const pendingCall = DB.jobs.filter(j => j.status === 'received' && !j.calledBy).length;
+  const pendingCement = DB.jobs.filter(j => j.status === 'called' && !j.cementDate).length;
+
+  document.getElementById('statsGrid').innerHTML = `
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-label">Total Jobs</div></div>
+    <div class="stat-card"><div class="stat-num">${active}</div><div class="stat-label">Active Jobs</div></div>
+    <div class="stat-card"><div class="stat-num warn">${dueToday}</div><div class="stat-label">Due Today</div></div>
+    <div class="stat-card"><div class="stat-num danger">${late}</div><div class="stat-label">Overdue</div></div>
+    <div class="stat-card"><div class="stat-num warn">${pendingCall}</div><div class="stat-label">Pending Calls</div></div>
+    <div class="stat-card"><div class="stat-num success">${pendingCement}</div><div class="stat-label">For Cementation</div></div>`;
+
+  // Action list
+  const actions = DB.jobs.filter(j =>
+    (j.status === 'received' && !j.calledBy) ||
+    (j.status === 'called' && !j.cementDate)
+  );
+
+  document.getElementById('actionList').innerHTML = actions.length
+    ? actions.map(j => `<div class="job-card" onclick="openJobCard('${j.id}')">
+        <div class="job-card-top">
+          <div>
+            <div class="job-card-id">${j.id}</div>
+            <div class="job-card-name">${j.patientName}</div>
+            <div class="job-card-meta">📱 ${j.mobile} · ${j.lab || ''}</div>
+          </div>
+          <span class="status-badge s-${j.status === 'received' ? 'received' : 'called'}">
+            ${j.status === 'received' ? '📞 Call Patient' : '🦷 Book Cementation'}
+          </span>
+        </div>
+      </div>`).join('')
+    : `<div class="empty-state"><div class="empty-icon">✅</div><div class="empty-text">All caught up!</div></div>`;
+
+  // Overdue list
+  const overdue = DB.jobs.filter(j => j.expectedReturn && !j.receivedDate &&
+    new Date(j.expectedReturn) <= new Date(Date.now() + 864e5));
+
+  document.getElementById('overdueList').innerHTML = overdue.length
+    ? overdue.map(j => {
+        const isLate = new Date(j.expectedReturn) < new Date();
+        return `<div class="job-card" onclick="openJobCard('${j.id}')">
+          <div class="job-card-top">
+            <div>
+              <div class="job-card-id">${j.id}</div>
+              <div class="job-card-name">${j.patientName}</div>
+              <div class="job-card-meta">🏭 ${j.lab || '—'} · Due: ${formatDate(j.expectedReturn)}</div>
+            </div>
+            <span class="status-badge ${isLate ? 's-late' : 's-dispatched'}">${isLate ? '⚠️ Late' : '⏰ Due Soon'}</span>
+          </div>
+        </div>`;
+      }).join('')
+    : `<div class="empty-state"><div class="empty-icon">🎯</div><div class="empty-text">Nothing overdue!</div></div>`;
+}
+
+// ══════════ BILLING ══════════
+function populateBillingLabFilter() {
+  const sel = document.getElementById('bLab');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">All Labs</option>';
+  DB.labs.forEach(l => {
+    const o = document.createElement('option');
+    o.value = l.name; o.textContent = l.name;
+    sel.appendChild(o);
+  });
+}
+
+function renderBilling() {
+  const month = +g('bMonth');
+  const year = +g('bYear');
+  const labF = g('bLab');
+
+  const filtered = DB.jobs.filter(j => {
+    const d = new Date(j.createdAt);
+    return d.getMonth() === month && d.getFullYear() === year && (!labF || j.lab === labF);
+  });
+
+  let html = '';
+
+  // LAB-WISE
+  html += `<div class="billing-section-title">🏭 Lab-wise Summary</div>`;
+  html += `<div class="table-wrap-scroll"><table class="data-table"><thead>
+    <tr><th>Lab</th><th>Jobs</th><th>Total Units</th><th>Crowns</th><th>Pontics</th>
+    <th>Invoice (₹)</th><th>Paid (₹)</th><th>Status</th></tr></thead><tbody>`;
+
+  let gj = 0, gu = 0, gc = 0, gp = 0, gi = 0, gpd = 0;
+  DB.labs.forEach(lab => {
+    if (labF && lab.name !== labF) return;
+    const lj = filtered.filter(j => j.lab === lab.name);
+    if (!lj.length) return;
+    const units = lj.reduce((s, j) => (j.units || []).reduce((ss, r) => (+r.crowns) + (+r.pontics) + ss, 0) + s, 0);
+    const crowns = lj.reduce((s, j) => (j.units || []).reduce((ss, r) => (+r.crowns) + ss, 0) + s, 0);
+    const pontics = lj.reduce((s, j) => (j.units || []).reduce((ss, r) => (+r.pontics) + ss, 0) + s, 0);
+    const inv = lj.reduce((s, j) => (+j.labAmount || 0) + s, 0);
+    const paid = lj.reduce((s, j) => (+j.finalLabPaid || 0) + s, 0);
+    gj += lj.length; gu += units; gc += crowns; gp += pontics; gi += inv; gpd += paid;
+    html += `<tr><td><strong>${lab.name}</strong></td><td>${lj.length}</td><td><strong>${units}</strong></td>
+      <td>${crowns}</td><td>${pontics}</td>
+      <td>₹${inv.toLocaleString('en-IN')}</td><td>₹${paid.toLocaleString('en-IN')}</td>
+      <td>${paid >= inv && inv > 0 ? '✅ Paid' : '⏳ Pending'}</td></tr>`;
+  });
+  html += `<tr class="total-row"><td>TOTAL</td><td>${gj}</td><td>${gu}</td><td>${gc}</td><td>${gp}</td>
+    <td>₹${gi.toLocaleString('en-IN')}</td><td>₹${gpd.toLocaleString('en-IN')}</td><td></td></tr>`;
+  html += `</tbody></table></div>`;
+
+  // MATERIAL-WISE
+  html += `<div class="billing-section-title">🔩 Material-wise Breakdown</div>`;
+  html += `<div class="table-wrap-scroll"><table class="data-table"><thead>
+    <tr><th>Material</th><th>Crowns</th><th>Pontics</th><th>Total Units</th><th>Amount (₹)</th></tr>
+    </thead><tbody>`;
+  const matMap = {};
+  filtered.forEach(j => (j.units || []).forEach(r => {
+    const m = r.mat || 'Unknown';
+    if (!matMap[m]) matMap[m] = { c: 0, p: 0, amt: 0 };
+    matMap[m].c += (+r.crowns); matMap[m].p += (+r.pontics);
+    matMap[m].amt += ((+r.crowns) + (+r.pontics)) * (+r.rate);
+  }));
+  let mtu = 0, mta = 0;
+  Object.entries(matMap).sort((a, b) => b[1].amt - a[1].amt).forEach(([mat, v]) => {
+    mtu += v.c + v.p; mta += v.amt;
+    html += `<tr><td><strong>${mat}</strong></td><td>${v.c}</td><td>${v.p}</td>
+      <td><strong>${v.c + v.p}</strong></td><td>₹${v.amt.toLocaleString('en-IN')}</td></tr>`;
+  });
+  html += `<tr class="total-row"><td>TOTAL</td><td></td><td></td><td>${mtu}</td><td>₹${mta.toLocaleString('en-IN')}</td></tr>`;
+  html += `</tbody></table></div>`;
+
+  // JOB DETAIL
+  html += `<div class="billing-section-title">📋 All Jobs This Month</div>`;
+  html += `<div class="table-wrap-scroll"><table class="data-table"><thead>
+    <tr><th>Job ID</th><th>Patient</th><th>Mobile</th><th>Lab</th><th>Work</th><th>Materials</th>
+    <th>Units</th><th>Invoice ₹</th><th>Paid ₹</th><th>Bill Status</th></tr></thead><tbody>`;
+  filtered.forEach(j => {
+    const tu = (j.units || []).reduce((s, r) => (+r.crowns) + (+r.pontics) + s, 0);
+    const mats = [...new Set((j.units || []).map(r => r.mat).filter(Boolean))].join(', ') || '—';
+    html += `<tr>
+      <td style="font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--accent);">${j.id}</td>
+      <td><strong>${j.patientName}</strong></td><td>${j.mobile}</td>
+      <td>${j.lab || '—'}</td><td>${j.workType || '—'}</td><td>${mats}</td>
+      <td><strong>${tu}</strong></td>
+      <td>₹${(+j.labAmount || 0).toLocaleString('en-IN')}</td>
+      <td>₹${(+j.finalLabPaid || 0).toLocaleString('en-IN')}</td>
+      <td>${j.billStatus || '⏳ Pending'}</td>
+    </tr>`;
+  });
+  html += `</tbody></table></div>`;
+
+  document.getElementById('billingContent').innerHTML = filtered.length ? html :
+    `<div class="empty-state"><div class="empty-icon">📭</div><div class="empty-text">No jobs for this period</div></div>`;
+}
+
+// ══════════ SETTINGS ══════════
+function renderSettings() {
+  // Receptionists
+  document.getElementById('receptionistList').innerHTML = DB.receptionists.map(r => `
+    <div class="person-row">
+      <div><div class="person-name">${r.name}</div><div class="person-role">Receptionist</div></div>
+      <button class="person-delete" onclick="deletePerson('receptionist','${r.id}')">🗑</button>
+    </div>`).join('') || '<p style="color:var(--muted);font-size:13px;">No receptionists added.</p>';
+
+  // Doctors
+  document.getElementById('doctorList').innerHTML = DB.doctors.map(d => `
+    <div class="person-row">
+      <div>
+        <div class="person-name">${d.name}</div>
+        <div class="person-role">${d.type === 'principal' ? '👑 Principal Doctor' : '🩺 Assistant Doctor'} · ${d.role}</div>
+      </div>
+      ${d.role !== 'admin' ? `<button class="person-delete" onclick="deletePerson('doctor','${d.id}')">🗑</button>` : '<span style="font-size:11px;color:var(--muted);">Admin</span>'}
+    </div>`).join('');
+
+  // Labs
+  document.getElementById('labList').innerHTML = DB.labs.map(l => `
+    <div class="person-row">
+      <div><div class="person-name">${l.name}</div><div class="person-role">Lab</div></div>
+      <button class="person-delete" onclick="deletePerson('lab','${l.id}')">🗑</button>
+    </div>`).join('') || '<p style="color:var(--muted);font-size:13px;">No labs added.</p>';
+
+  // Sheets URL
+  const urlEl = document.getElementById('sheetsUrl');
+  if (urlEl) urlEl.value = DB.sheetsUrl || '';
+}
+
+function addPerson(type) {
+  if (type === 'receptionist') {
+    const name = document.getElementById('newReceptionist').value.trim();
+    if (!name) { showToast('Enter a name', 'warn'); return; }
+    DB.receptionists.push({ id: 'r' + Date.now(), name, role: 'receptionist' });
+    document.getElementById('newReceptionist').value = '';
+  } else if (type === 'doctor') {
+    const name = document.getElementById('newDoctor').value.trim();
+    const role = document.getElementById('newDoctorRole').value;
+    if (!name) { showToast('Enter doctor name', 'warn'); return; }
+    DB.doctors.push({ id: 'd' + Date.now(), name, role: 'doctor', type: role });
+    document.getElementById('newDoctor').value = '';
+  } else if (type === 'lab') {
+    const name = document.getElementById('newLab').value.trim();
+    if (!name) { showToast('Enter lab name', 'warn'); return; }
+    DB.labs.push({ id: 'l' + Date.now(), name });
+    document.getElementById('newLab').value = '';
+  }
+  saveDB();
+  renderSettings();
+  populateDropdowns();
+  showToast('✅ Added successfully!', 'success');
+}
+
+function deletePerson(type, id) {
+  if (!confirm('Delete this entry?')) return;
+  if (type === 'receptionist') DB.receptionists = DB.receptionists.filter(r => r.id !== id);
+  else if (type === 'doctor') DB.doctors = DB.doctors.filter(d => d.id !== id || d.role === 'admin');
+  else if (type === 'lab') DB.labs = DB.labs.filter(l => l.id !== id);
+  saveDB();
+  renderSettings();
+  populateDropdowns();
+  showToast('Deleted', 'success');
+}
+
+function changePin(role) {
+  const el = document.getElementById('pin' + role.charAt(0).toUpperCase() + role.slice(1));
+  if (!el) return;
+  const newPin = el.value.trim();
+  if (!/^\d{4}$/.test(newPin)) { showToast('PIN must be exactly 4 digits', 'error'); return; }
+  DB.pins[role] = newPin;
+  saveDB();
+  el.value = '';
+  showToast('🔒 PIN updated!', 'success');
+}
+
+function saveSheetsUrl() {
+  DB.sheetsUrl = document.getElementById('sheetsUrl').value.trim();
+  saveDB();
+  showToast('✅ Google Sheets URL saved!', 'success');
+}
+
+// ══════════ GOOGLE SHEETS SYNC ══════════
+async function syncToSheets() {
+  if (!DB.sheetsUrl) {
+    showToast('Set Google Sheets URL in Settings first', 'warn');
+    return;
+  }
+  document.getElementById('syncStatus').textContent = '🔄 Syncing...';
+  try {
+    const response = await fetch(DB.sheetsUrl, {
+      method: 'POST',
+      body: JSON.stringify({ action: 'syncAll', jobs: DB.jobs }),
+      headers: { 'Content-Type': 'text/plain' }
+    });
+    const result = await response.json();
+    document.getElementById('syncStatus').textContent = '✅ Synced ' + new Date().toLocaleTimeString('en-IN');
+    showToast('☁ Synced to Google Sheets!', 'success');
+  } catch (e) {
+    document.getElementById('syncStatus').textContent = '❌ Sync failed';
+    showToast('Sync failed. Check URL.', 'error');
+  }
+}
+
+function syncToSheetsAuto(job) {
+  if (!DB.sheetsUrl) return;
+  fetch(DB.sheetsUrl, {
+    method: 'POST',
+    body: JSON.stringify({ action: 'upsertJob', job }),
+    headers: { 'Content-Type': 'text/plain' }
+  }).catch(() => {});
+}
+
+// ══════════ EXPORT CSV ══════════
+function exportCSV() {
+  const headers = ['Job ID','Patient','Mobile','Bestosys ID','Visit Date','Receptionist','Doctor',
+    'Tooth','Work Type','Lab','Expected Return','Materials','Total Units','Status',
+    'Cast By','Dispatched','Challan','Received Date','Quality',
+    'Lab Invoice','Called By','Appointment Date','Cemented By','Cement Date',
+    'Patient Payment','Bill Status','Final Paid'];
+
+  const rows = DB.jobs.map(j => {
+    const tu = (j.units || []).reduce((s, r) => (+r.crowns) + (+r.pontics) + s, 0);
+    const mats = [...new Set((j.units || []).map(r => r.mat).filter(Boolean))].join(' | ');
+    return [
+      j.id, j.patientName, j.mobile, j.bestosysId, j.visitDate, j.receptionistName,
+      j.doctorName, j.tooth, j.workType, j.lab, j.expectedReturn, mats, tu, j.status,
+      j.castBy, j.dispatchTime, j.challan, j.receivedDate, j.quality,
+      j.labAmount, j.calledBy, j.appointmentDate, j.cementDoctor, j.cementDate,
+      j.patientPayment, j.billStatus, j.finalLabPaid
+    ].map(v => `"${(v || '').toString().replace(/"/g, '""')}"`);
+  });
+
+  const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `SmileXpert_Jobs_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('📥 CSV exported!', 'success');
+}
+
+// ══════════ HELPERS ══════════
+function getStatusLabel(s) {
+  return {
+    registered: '🗂 Registered', impression: '🦷 Impression',
+    cast: '🧱 Cast Poured', dispatched: '🚴 Dispatched',
+    received: '📦 Received', called: '📞 Called',
+    cemented: '✅ Cemented', billed: '💰 Billed'
+  }[s] || s;
+}
+
+function formatDate(d) {
+  if (!d) return '—';
+  const [y, m, day] = d.split('-');
+  return `${day}/${m}/${y}`;
+}
+
+function formatDateTime(iso) {
+  if (!iso) return '—';
+  return new Date(iso).toLocaleString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+}
+
+let toastTimer;
+function showToast(msg, type = '') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'show' + (type ? ' ' + type : '');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => t.className = '', 3000);
+}
+
+// ══════════ START ══════════
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
+</body>
+</html>
